@@ -5,7 +5,6 @@ const HeaderTitle = () => {
   const segments = location.pathname.split("/");
 
   const capitalizedSegments = segments.map((segment) => {
-    let subStr;
     let result;
     if (segment.length === 0) {
       return segment;
@@ -20,7 +19,7 @@ const HeaderTitle = () => {
         const restOfString = segment.slice(1);
         return firstChar + restOfString;
       });
-      return (subStr = result.map((str) => str).join(" "));
+      return result.map((str) => str).join(" ");
     }
 
     const firstChar = segment.charAt(0).toUpperCase();

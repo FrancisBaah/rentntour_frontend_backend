@@ -16,7 +16,7 @@ const Register = () => {
     e.preventDefault();
     try {
       const res = await PostAPI("auth/register", form);
-      if (res.status === 201) {
+      if (res?.status === 201) {
         message.success("Registration successful");
         navigate("/login");
       }
