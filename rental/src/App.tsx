@@ -1,9 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ExperienceSlider from "./components/ExperienceSlider";
 import HeroPage from "./components/HeroPage";
-import NavBar from "./components/NavBar";
-import WhatsHappeningNow from "./components/WhatsHappeningNow";
-import ArticlesPage from "./components/ArticlesPage";
 import PackageDetails from "./components/PackageDetails";
 import CategoryPage from "./components/CategoryPage";
 import CategorySlider from "./components/CategorySlider";

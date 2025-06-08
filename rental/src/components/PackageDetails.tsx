@@ -96,9 +96,7 @@ const PackageDetails = () => {
 
   const [selectedOption, setSelectedOption] = useState<Option | null>(null);
 
-  const [dateOptions, setDateOptions] = useState<DateOption[]>(() =>
-    generateDateOptions(7)
-  );
+  const [dateOptions] = useState<DateOption[]>(() => generateDateOptions(7));
 
   const [loading, setLoading] = useState(false);
   const [isConfirm, setIsConfirm] = useState(false);

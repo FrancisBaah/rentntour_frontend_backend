@@ -2,15 +2,38 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { GetAPI } from "../assets/constants";
 
+interface Activity {
+  id: number;
+  title: string;
+  category: string;
+  description: string;
+  price: string;
+  image: string;
+  rating: number;
+  reviews: number;
+}
+interface APIActivity {
+  activity_id: number;
+  activity_name: string;
+  about: string;
+  options?: { price?: number }[];
+  image?: { url: string; order: number }[];
+}
+
+interface APICategory {
+  category_name: string;
+  activities: APIActivity[];
+}
+
 const CategoryPage = () => {
   const { slug } = useParams();
   const [selectedCat, setSelectedCat] = useState("All");
-  const [activities, setActivities] = useState([]);
-  const [categories, setCategories] = useState(["All"]);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [categories, setCategories] = useState<string[]>(["All"]);
   const navigate = useNavigate();
 
-  const toSlug = (str) => str.toLowerCase().replace(/\s+/g, "-");
-  const fromSlug = (slug) =>
+  const toSlug = (str: string) => str.toLowerCase().replace(/\s+/g, "-");
+  const fromSlug = (slug: string | undefined) =>
     categories.find((cat) => toSlug(cat) === slug) ?? "All";
 
   useEffect(() => {
@@ -20,37 +43,39 @@ const CategoryPage = () => {
 
   useEffect(() => {
     const fetchActivities = async () => {
-      const data = await GetAPI<any[]>("activities");
+      const data = await GetAPI<APICategory[]>("activities");
 
       if (data) {
         const categorySet = new Set<string>();
 
-        const flatActivities = data.flatMap((category) => {
-          categorySet.add(category.category_name);
+        const flatActivities: Activity[] = data.flatMap(
+          (category: APICategory) => {
+            categorySet.add(category.category_name);
 
-          return category.activities.map((act) => {
-            const minPrice =
-              act.options?.length > 0
-                ? Math.min(...act.options.map((opt) => opt.price || 0))
-                : undefined;
+            return category.activities.map((act) => {
+              const minPrice =
+                Array.isArray(act.options) && act.options?.length > 0
+                  ? Math.min(...act.options.map((opt) => opt.price || 0))
+                  : undefined;
 
-            const firstImage =
-              act.image?.length > 0
-                ? act.image.sort((a, b) => a.order - b.order)[0].url
-                : "/default-image.jpg";
+              const firstImage =
+                Array.isArray(act.image) && act.image?.length > 0
+                  ? act.image.sort((a, b) => a.order - b.order)[0].url
+                  : "/default-image.jpg";
 
-            return {
-              id: act.activity_id,
-              title: act.activity_name,
-              category: category.category_name,
-              description: act.about,
-              price: `AED ${minPrice?.toFixed(2) ?? "--"}`,
-              image: firstImage,
-              rating: 4.4, // placeholder
-              reviews: 1000 + Math.floor(Math.random() * 10000), // placeholder
-            };
-          });
-        });
+              return {
+                id: act.activity_id,
+                title: act.activity_name,
+                category: category.category_name,
+                description: act.about,
+                price: `AED ${minPrice?.toFixed(2) ?? "--"}`,
+                image: firstImage,
+                rating: 4.4, // placeholder
+                reviews: 1000 + Math.floor(Math.random() * 10000), // placeholder
+              };
+            });
+          }
+        );
 
         setActivities(flatActivities);
         setCategories(["All", ...Array.from(categorySet)]);
@@ -60,7 +85,7 @@ const CategoryPage = () => {
     fetchActivities();
   }, []);
 
-  const handleCategoryClick = (cat) => {
+  const handleCategoryClick = (cat: string) => {
     setSelectedCat(cat);
     navigate(`/category/${toSlug(cat)}`);
   };
@@ -92,7 +117,7 @@ const CategoryPage = () => {
               selectedCat === "" ||
               act.category === selectedCat
           )
-          .map((act, index) => (
+          .map((act) => (
             <div
               key={act.id}
               className="border border-gray-200 rounded-lg overflow-hidden shadow-sm flex flex-col justify-between"
